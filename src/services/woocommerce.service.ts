@@ -2,6 +2,7 @@ import wooCommerceClient from "../config/woocommerce.config";
 
 import {
   transformCategoriesData,
+  transformCustomersData,
   transformOrdersData,
   transformProductsData,
 } from "../utils/helpers";
@@ -12,7 +13,7 @@ export const transformations: Record<string, TransformFunction> = {
   products: transformProductsData,
   "products/categories": transformCategoriesData,
   orders: transformOrdersData,
-  // customers:
+  customers: transformCustomersData,
 };
 
 async function searchWooCommerce<T>(
@@ -23,7 +24,7 @@ async function searchWooCommerce<T>(
     console.log("params: ", params);
     console.log("endpoint: ", endpoint);
 
-    const result = await wooCommerceClient.get(endpoint, params);
+    let result = await wooCommerceClient.get(endpoint, params);
 
     const transformationFunction = transformations[endpoint];
 
