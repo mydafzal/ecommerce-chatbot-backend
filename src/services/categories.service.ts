@@ -29,6 +29,10 @@ async function setCachedCategories(categories: Category[]) {
 
 async function fetchAndCacheCategories() {
   try {
+    if (await getCachedCategories()) {
+      return;
+    }
+
     const categories = await WooCommerceService.searchWooCommerce<Category[]>(
       WOOCOMMERCE_ENDPOINTS.CATEGORIES
     );
