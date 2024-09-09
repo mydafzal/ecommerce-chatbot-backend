@@ -15,9 +15,9 @@ import { chatSystemPrompt } from "../prompts/chat.prompt";
 import { orderSearchTool } from "../tools/orders.tool";
 import { productSearchTool } from "../tools/products.tool";
 
-import { RedisChatMessageHistory } from "@langchain/community/stores/message/ioredis";
 import { Redis } from "ioredis";
 import { customerSearchTool } from "../tools/customers.tool";
+import { ExtendedRedisChatMemory } from "../../utils/helpers";
 
 const client = new Redis(`redis://localhost:${process.env.REDIS_PORT}`);
 
@@ -58,7 +58,7 @@ export async function generateAgentResponse(chatId: string, userQuery: string) {
   const agentWithChatHistory = new RunnableWithMessageHistory({
     runnable: agentExecutor,
     getMessageHistory: (sessionId) =>
-      new RedisChatMessageHistory({
+      new ExtendedRedisChatMemory({
         sessionId,
         client,
       }),

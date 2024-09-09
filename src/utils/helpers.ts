@@ -1,11 +1,26 @@
+import { RedisChatMessageHistory } from "@langchain/community/stores/message/ioredis";
 import { Category } from "./interfaces/category.interface";
 import { Order } from "./interfaces/order.interface";
 import { Product } from "./interfaces/product.interface";
+import { Customer } from "./interfaces/customer.interface";
 
 export function generateChatId() {
   const timestamp = Date.now().toString(36);
   const randomString = Math.random().toString(36).substr(2, 5);
   return `chat_${timestamp}_${randomString}`;
+}
+
+export class ExtendedRedisChatMemory extends RedisChatMessageHistory {
+  async addMessage(message: any) {
+    const messages = await this.getMessages();
+
+    message.additional_kwargs = {
+      timestamp: new Date().getTime(),
+      id: messages.length + 1,
+    };
+
+    await super.addMessage(message);
+  }
 }
 
 export function transformCategoriesData(rawData: any[]): Category[] {
@@ -18,26 +33,28 @@ export function transformCategoriesData(rawData: any[]): Category[] {
 }
 
 export function transformProductsData(rawData: any[]): Product[] {
-  return rawData.map((item) => ({
-    id: item.id,
-    name: item.name,
-    description: item.description ? item.description.substring(0, 300) : "",
-    shortDescription: item.short_description,
-    price: item.price,
-    regularPrice: item.regular_price,
-    categories: item.categories.map((category: any) => category.name),
-    attributes: item.attributes.map((attribute: any) => attribute.id),
-    tags: item.tags.map((tag: any) => tag.name),
-    images: item.images.map((image: any) => image.src),
-    relatedProductIds: item.related_product_ids,
-    averageRating: item.average_rating,
-    featured: item.featured,
-    parentId: item.parent_id,
-    permalink: item.permalink,
-    purchaseNote: item.purchase_note,
-    onSale: item.on_sale,
-    salePrice: item.sale_price,
-    stockStatus: item.stock_status,
+  return rawData.map((product) => ({
+    id: product.id,
+    name: product.name,
+    description: product.description
+      ? product.description.substring(0, 300)
+      : "",
+    shortDescription: product.short_description,
+    price: product.price,
+    regularPrice: product.regular_price,
+    categories: product.categories.map((category: any) => category.name),
+    attributes: product.attributes.map((attribute: any) => attribute.id),
+    tags: product.tags.map((tag: any) => tag.name),
+    images: product.images.map((image: any) => image.src),
+    relatedProductIds: product.related_product_ids,
+    averageRating: product.average_rating,
+    featured: product.featured,
+    parentId: product.parent_id,
+    permalink: product.permalink,
+    purchaseNote: product.purchase_note,
+    onSale: product.on_sale,
+    salePrice: product.sale_price,
+    stockStatus: product.stock_status,
   }));
 }
 
@@ -78,5 +95,17 @@ function extractMetadata(metadata: any) {
   return metadata.map((item: any) => ({
     key: item.key,
     value: item.value,
+  }));
+}
+
+export function transformCustomersData(rawData: any[]): Customer[] {
+  return rawData.map((customer) => ({
+    id: customer.id,
+    fullName: `${customer.first_name} ${customer.last_name}`,
+    email: customer.email,
+    avatarUrl: customer.avatar_url,
+    billing: customer.billing,
+    isPayingCustomer: customer.is_paying_customer,
+    shipping: customer.shipping,
   }));
 }
