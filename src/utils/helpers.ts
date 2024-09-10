@@ -55,6 +55,7 @@ export function transformProductsData(rawData: any[]): Product[] {
     onSale: product.on_sale,
     salePrice: product.sale_price,
     stockStatus: product.stock_status,
+    metadata: extractMetadata(product.meta_data, "product"),
   }));
 }
 
@@ -87,11 +88,17 @@ function extractOrderItems(order: any) {
     productName: item.name,
     quantity: item.quantity,
     price: item.price,
-    metadata: extractMetadata(item.meta_data),
+    metadata: extractMetadata(item.meta_data, "order"),
   }));
 }
 
-function extractMetadata(metadata: any) {
+function extractMetadata(metadata: any[], entity: string) {
+  if (entity === "product") {
+    metadata = metadata.filter(
+      (item: any) => !item.key.startsWith("_") && item.value
+    );
+  }
+
   return metadata.map((item: any) => ({
     key: item.key,
     value: item.value,

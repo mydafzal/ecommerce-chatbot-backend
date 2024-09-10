@@ -18,7 +18,7 @@ export interface Product {
   attributes: number[];
   relatedProductIds: number[];
   stockStatus: StockStatus;
-  //   metadata: ProductMetaData[];
+  metadata: ProductMetaData[];
 }
 
 export enum StockStatus {
@@ -27,7 +27,7 @@ export enum StockStatus {
   OnBackorder = "onbackorder",
 }
 
-// export interface ProductMetaData {
-//   key: string;
-//   value: string;
-// }
+export interface ProductMetaData {
+  key: string;
+  value: string;
+}
