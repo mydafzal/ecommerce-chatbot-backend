@@ -10,14 +10,20 @@ import { RunnableWithMessageHistory } from "@langchain/core/runnables";
 import { AgentExecutor, createOpenAIFunctionsAgent } from "langchain/agents";
 
 import { CategoriesService } from "../../services/categories.service";
-import { formatCategoriesToString } from "../../utils/formatters";
-import { chatSystemPrompt } from "../prompts/chat.prompt";
+import { formatCategoriesToString, formatObject } from "../../utils/formatters";
+import {
+  chatSystemPromptForCustomers,
+  chatSystemPromptForGuestUsers,
+} from "../prompts/chat.prompt";
 import { orderSearchTool } from "../tools/orders.tool";
 import { productSearchTool } from "../tools/products.tool";
 
 import { Redis } from "ioredis";
-import { customerSearchTool } from "../tools/customers.tool";
+import { UserDetails } from "../../dtos";
 import { ExtendedRedisChatMemory } from "../../utils/helpers";
+import { createCustomerSearchTool } from "../tools/customers.tool";
+import { StructuredToolInterface } from "@langchain/core/tools";
+// import { customerSearchTool } from "../tools/customers.tool";
 
 const client = new Redis(`redis://localhost:${process.env.REDIS_PORT}`);
 
@@ -26,16 +32,43 @@ const model = new ChatOpenAI({
   temperature: 0,
 });
 
-const tools = [productSearchTool, orderSearchTool, customerSearchTool];
+const tools: StructuredToolInterface[] = [productSearchTool, orderSearchTool];
 
-export async function generateAgentResponse(chatId: string, userQuery: string) {
+export async function generateAgentResponse(
+  chatId: string,
+  userQuery: string,
+  userDetails?: UserDetails
+) {
   const categories = await CategoriesService.getCachedCategories();
 
-  const systemPrompt = await PromptTemplate.fromTemplate(
-    chatSystemPrompt
-  ).format({
-    categories: formatCategoriesToString(categories),
-  });
+  if (userDetails) {
+    const customerSearchTool = createCustomerSearchTool(userDetails.id);
+    tools.push(customerSearchTool);
+  }
+
+  // const systemPrompt = await PromptTemplate.fromTemplate(
+  //   chatSystemPrompt
+  // ).format({
+  //   categories: formatCategoriesToString(categories),
+  // });
+
+  let systemPrompt: any;
+
+  if (userDetails) {
+    systemPrompt = await PromptTemplate.fromTemplate(
+      chatSystemPromptForCustomers
+    ).format({
+      categories: formatCategoriesToString(categories),
+      customer: formatObject(userDetails),
+      customerName: userDetails.name,
+    });
+  } else {
+    systemPrompt = await PromptTemplate.fromTemplate(
+      chatSystemPromptForGuestUsers
+    ).format({
+      categories: formatCategoriesToString(categories),
+    });
+  }
 
   let prompt = ChatPromptTemplate.fromMessages([
     new SystemMessage(systemPrompt),

@@ -5,12 +5,15 @@ import { Product } from "../../utils/interfaces/product.interface";
 import { WOOCOMMERCE_ENDPOINTS } from "../../utils/constants";
 
 const productSearchSchema = z.object({
-  search: z.string().optional().describe("name of a specific product"),
+  search: z.string().optional().describe(
+    "a search term containing keywords separated by spaces, to search for products that contain these terms within their name, description or other key properties."
+    // "name of a specific product. do not guess this name. you will get the product details only if you specify the EXACT matching product name. this means that only when you HAVE a specific product name that actually exists in our product catalog, then you can provide that name here to get details of that product."
+  ),
   category: z
     .string()
     .optional()
     .describe(
-      "ID of a specific category to search products assigned to this category"
+      "ID of a specific category to search products assigned to this category. useful for retrieving products that belong to a specific category. If specificed, the SHOULD BE the ID of a specific category, not a category name"
     ),
   max_price: z
     .number()
