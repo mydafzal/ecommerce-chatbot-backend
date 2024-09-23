@@ -31,7 +31,7 @@ import { chromaStore } from "../../config/chromaDb.config";
 // import { customerSearchTool } from "../tools/customers.tool";
 
 const client = new Redis(`redis://localhost:${process.env.REDIS_PORT}`);
-const tools: StructuredToolInterface[] = [productSearchTool, orderSearchTool];
+const tools: StructuredToolInterface[] = [productSearchTool];
 
 const model = new ChatOpenAI({
   model: "gpt-4o-mini",
@@ -41,9 +41,9 @@ async function addKnowledgeTool() {
   // Use the retriever from Chroma for querying
   const vectorStoreRetriever = chromaStore.asRetriever();
   const retrieverTool = createRetrieverTool(vectorStoreRetriever, {
-    name: "FAQ",
+    name: "information-retriever-tool",
     description:
-      "This tool is designed to provide answers based solely on Bosa’s policies, FAQs and terms and conditions. Please use it exclusively for inquiries related to Bosa, including topics like general information, payments, orders, intellectual property, shipping and delivery, returns and exchanges, and restrictions. If relevant information is found, provide a clear and accurate response. If no relevant information is available, kindly inform the user that the answer couldn’t be found based on the FAQs and ask for clarification, avoiding independent answers or speculation.",
+      "This tool retrieves information on frequently asked questions (FAQs), brand details, business policies, and similar queries. Use this tool to provide accurate responses to those types of questions.",
   });
 
   tools.push(retrieverTool);
@@ -118,6 +118,7 @@ export async function generateAgentResponse(
   let systemPrompt: any;
 
   if (userDetails) {
+    tools.push(orderSearchTool);
     systemPrompt = await PromptTemplate.fromTemplate(
       chatSystemPromptForCustomers
     ).format({
@@ -126,6 +127,9 @@ export async function generateAgentResponse(
       customerName: userDetails.name,
     });
   } else {
+    console.log("userDetails");
+    console.log(userDetails);
+    console.log("Guest - User");
     systemPrompt = await PromptTemplate.fromTemplate(
       chatSystemPromptForGuestUsers
     ).format({

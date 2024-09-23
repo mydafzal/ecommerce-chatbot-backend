@@ -26,6 +26,7 @@ router.post(
   async (req: Request, res: Response) => {
     const body: SendMessageDto = req.body;
 
+    console.log("req.body");
     console.log(req.body);
 
     const response = await ChatsService.sendMessage(
@@ -58,7 +59,5 @@ router.get("/:id", async (req: Request, res: Response) => {
   // res.status(200).json({ data: messages.reverse() });
   res.status(200).send({ data: messages.reverse() });
 });
-
-
 
 export default router;

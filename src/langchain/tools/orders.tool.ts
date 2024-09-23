@@ -23,10 +23,16 @@ const orderSearchSchema = z.object({
     ])
     .optional()
     .describe("search orders matching that are currently in a specific status"),
+  // customer: z
+  //   .number()
+  //   .optional()
+  //   .describe("search orders for a specific customer"),
+
   customer: z
     .number()
-    .optional()
-    .describe("search orders for a specific customer"),
+    .describe(
+      " use the logged-in userId to search for a specific customer's orders (an id inside userDetails object)"
+    ),
 });
 
 export const orderSearchTool = new DynamicStructuredTool({
@@ -38,6 +44,9 @@ export const orderSearchTool = new DynamicStructuredTool({
       WOOCOMMERCE_ENDPOINTS.ORDERS,
       params
     );
+
+    console.log("result");
+    console.log(result);
     return JSON.stringify(result);
   },
 });
