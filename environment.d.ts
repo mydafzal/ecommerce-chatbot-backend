@@ -6,6 +6,7 @@ declare global {
       WOOCOMMERCE_CONSUMER_SECRET: string;
       REDIS_PORT: number;
       REDIS_PASSWORD: string;
+      OPENAI_API_KEY: string;
     }
   }
 }

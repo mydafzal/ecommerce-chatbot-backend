@@ -14,14 +14,9 @@ router.post(
   "/",
   validateRequest(createChatSchema),
   async (req: Request, res: Response) => {
-    const body: CreateChatDto = req.body;
-
-    const response = await ChatsService.createChat(
-      body.message,
-      body.userDetails
-    );
-
-    res.status(201).json({ data: response });
+    const response = await ChatsService.createChat(req.body.message);
+    // res.status(201).json({ data: response });
+    res.status(201).send(response);
   }
 );
 
@@ -31,13 +26,16 @@ router.post(
   async (req: Request, res: Response) => {
     const body: SendMessageDto = req.body;
 
+    console.log(req.body);
+
     const response = await ChatsService.sendMessage(
       req.params.id,
       body.message,
       body.userDetails
     );
 
-    res.status(201).json({ data: response });
+    // res.status(200).json({ data: response });
+    res.status(200).send(response);
   }
 );
 
@@ -57,7 +55,10 @@ router.get("/:id", async (req: Request, res: Response) => {
     };
   });
 
-  res.status(200).json({ data: messages.reverse() });
+  // res.status(200).json({ data: messages.reverse() });
+  res.status(200).send({ data: messages.reverse() });
 });
+
+
 
 export default router;
