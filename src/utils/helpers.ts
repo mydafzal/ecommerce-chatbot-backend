@@ -3,6 +3,7 @@ import { Category } from "./interfaces/category.interface";
 import { Order } from "./interfaces/order.interface";
 import { Product } from "./interfaces/product.interface";
 import { Customer } from "./interfaces/customer.interface";
+import { Redis } from "ioredis";
 
 export function generateChatId() {
   const timestamp = Date.now().toString(36);
@@ -10,13 +11,41 @@ export function generateChatId() {
   return `chat_${timestamp}_${randomString}`;
 }
 
+// export class ExtendedRedisChatMemory extends RedisChatMessageHistory {
+//   async addMessage(message: any) {
+//     const messages = await this.getMessages();
+
+//     message.additional_kwargs = {
+//       timestamp: new Date().getTime(),
+//       id: messages.length + 1,
+//     };
+
+//     await super.addMessage(message);
+//   }
+// }
+
+interface ExtendedRedisChatMemoryConfig {
+  sessionId: string;
+  client: Redis;
+  senderName: string; // Add this line
+}
+
 export class ExtendedRedisChatMemory extends RedisChatMessageHistory {
+  private senderName: string;
+
+  constructor(config: ExtendedRedisChatMemoryConfig) {
+    super({ sessionId: config.sessionId, client: config.client });
+    this.senderName = config.senderName;
+  }
+
   async addMessage(message: any) {
     const messages = await this.getMessages();
 
     message.additional_kwargs = {
+      ...message.additional_kwargs,
       timestamp: new Date().getTime(),
       id: messages.length + 1,
+      senderName: this.senderName,
     };
 
     await super.addMessage(message);

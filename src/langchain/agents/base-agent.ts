@@ -100,6 +100,7 @@ addKnowledgeTool();
 export async function generateAgentResponse(
   chatId: string,
   userQuery: string,
+  senderName: string,
   userDetails?: UserDetails
 ) {
   const categories = await CategoriesService.getCachedCategories();
@@ -125,6 +126,7 @@ export async function generateAgentResponse(
       categories: formatCategoriesToString(categories),
       customer: formatObject(userDetails),
       customerName: userDetails.name,
+      loggedInUserId: userDetails.id,
     });
   } else {
     console.log("userDetails");
@@ -161,6 +163,7 @@ export async function generateAgentResponse(
       new ExtendedRedisChatMemory({
         sessionId,
         client,
+        senderName,
       }),
     inputMessagesKey: "input",
     historyMessagesKey: "chat_history",

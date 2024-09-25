@@ -40,7 +40,7 @@ export function createCustomerSearchTool(customerId: number) {
   return new DynamicStructuredTool({
     name: "customer-search-tool",
     description:
-      "a tool for retreiving details of the current customer. you can use this tool to retrieve the customer's information that you don't have but need to call another tool.",
+      "a tool for retreiving details of the current customer. you can use this tool to retrieve the customer's information.",
     schema: {},
     // schema: customerSearchSchema,
     func: async () => {

@@ -31,13 +31,13 @@ const orderSearchSchema = z.object({
   customer: z
     .number()
     .describe(
-      " use the logged-in userId to search for a specific customer's orders (an id inside userDetails object)"
+      "This is securely retrieved from the userDetails object, not extract from user input."
     ),
 });
 
 export const orderSearchTool = new DynamicStructuredTool({
   name: "order-search-tool",
-  description: "a tool for retreiving or searching order-related information",
+  description: "a tool for retreiving or searching order-related information.",
   schema: orderSearchSchema,
   func: async (params) => {
     const result = await WooCommerceService.searchWooCommerce<Order[]>(
@@ -45,8 +45,6 @@ export const orderSearchTool = new DynamicStructuredTool({
       params
     );
 
-    console.log("result");
-    console.log(result);
     return JSON.stringify(result);
   },
 });
