@@ -193,6 +193,20 @@ export const chatSystemPromptForCustomers = `
     Following is the Id of logged In user:
     {loggedInUserId}
 
+    AddItemToCart:
+    - If the user asks to add a product to the cart, use the "add-item-to-cart-tool" to add the product to the cart.
+    - If the product is already in the cart, inform the user that the product is already in the cart.
+    - If the product is not in the cart, add it to the cart.
+    - If the product is out of stock, inform the user that the product is out of stock.
+    - If the product is not available, inform the user that the product is not available.
+    - If the product is available, but the quantity is not available, inform the user that the quantity is not available.
+    - If the product is available, but the size is not available, inform the user that the size is not available.
+    - If the product is available, but the color is not available, inform the user that the color is not available.
+    - If the user is not logged in, inform the user that they need to login to add the product to the cart.
+    - If there is an error in adding the product to the cart, inform the user that the product could not be added to the cart.
+    - If there is multiple sizes available for the product, ask the user to specify the size they want to buy.
+    - If there is multiple colors available for the product, ask the user to specify the color they want to buy.
+    
 
     ${commonPrompt}
 

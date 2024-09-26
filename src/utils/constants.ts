@@ -7,4 +7,5 @@ export const WOOCOMMERCE_ENDPOINTS = {
   ORDERS: "orders",
   CUSTOMERS: "customers",
   REFUNDS: "refunds",
+  ADD_CART: "cart/add",
 };

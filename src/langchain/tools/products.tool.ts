@@ -8,10 +8,10 @@ import { WOOCOMMERCE_ENDPOINTS } from "../../utils/constants";
 //Improve search
 
 const productSearchSchema = z.object({
-  search: z.string().optional().describe(
-    "a search term containing keywords separated by spaces, to search for products that contain these terms within their name, description or other key properties."
-    // "name of a specific product. do not guess this name. you will get the product details only if you specify the EXACT matching product name. this means that only when you HAVE a specific product name that actually exists in our product catalog, then you can provide that name here to get details of that product."
-  ),
+  // search: z.string().optional().describe(
+  //   "a search term containing keywords separated by spaces, to search for products that contain these terms within their name, description or other key properties."
+  //   // "name of a specific product. do not guess this name. you will get the product details only if you specify the EXACT matching product name. this means that only when you HAVE a specific product name that actually exists in our product catalog, then you can provide that name here to get details of that product."
+  // ),
 
   category: z
     .string()

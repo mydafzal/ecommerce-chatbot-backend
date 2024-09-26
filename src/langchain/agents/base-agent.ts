@@ -28,6 +28,7 @@ import { UserDetails } from "../../dtos";
 import { ExtendedRedisChatMemory } from "../../utils/helpers";
 import { createCustomerSearchTool } from "../tools/customers.tool";
 import { chromaStore } from "../../config/chromaDb.config";
+import { addItemToCartTool } from "../tools/cart.tool";
 // import { customerSearchTool } from "../tools/customers.tool";
 
 const client = new Redis(`redis://localhost:${process.env.REDIS_PORT}`);
@@ -120,6 +121,7 @@ export async function generateAgentResponse(
 
   if (userDetails) {
     tools.push(orderSearchTool);
+    tools.push(addItemToCartTool);
     systemPrompt = await PromptTemplate.fromTemplate(
       chatSystemPromptForCustomers
     ).format({

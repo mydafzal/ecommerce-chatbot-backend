@@ -7,6 +7,7 @@ import {
   createChatSchema,
   sendMessageSchema,
 } from "../validators/chats. validator";
+import wooCommerceClient from "../config/woocommerce.config";
 
 const router = Router();
 
@@ -66,6 +67,63 @@ router.get("/:id", async (req: Request, res: Response) => {
 
   // res.status(200).json({ data: messages.reverse() });
   res.status(200).send({ data: messages.reverse() });
+});
+
+router.post("/cart/add-item", async (req: Request, res: Response) => {
+  try {
+    const { id, quantity } = req.query;
+    const nonce = req.headers["nonce"] as string;
+
+    console.log("nonce");
+    console.log(nonce);
+    console.log("id");
+    console.log(id);
+    console.log("quantity");
+    console.log(quantity);
+
+    if (!id || !quantity || !nonce) {
+      return res.status(400).json({ error: "Missing required parameters" });
+    }
+
+    // wooCommerceClient
+    //   .post("cart/add-item", {
+    //     id: 1750,
+    //     quantity: 2,
+    //   })
+    //   .then((response) => {
+    //     console.log(response.data);
+    //     console.log("success");
+
+    //     res.send(response);
+    //   })
+    //   .catch((error) => {
+    //     console.error(error.response.data);
+    //   });
+
+    const response = await fetch(
+      `http://localhost/bosa/wp-json/wc/store/v1/cart/add-item?id=${id}&quantity=${quantity}`,
+      {
+        method: "POST",
+        headers: {
+          nonce: nonce,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      console.log(await response.json());
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    res.status(200).json(data);
+  } catch (error) {
+    console.log(error);
+    console.error("Error adding item to cart:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while adding item to cart" });
+  }
 });
 
 export default router;
