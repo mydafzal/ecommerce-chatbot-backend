@@ -100,10 +100,15 @@ app.use(express.static(path.join(__dirname, "static")));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+app.use(
+  cors({
+    origin: ["http://localhost", "https://houseofbosa.com/staging"], // Allowed origins
+    credentials: true,
+  })
+);
 app.use(helmet());
 
-app.use("/chats", chatsController);
+app.use("/bosa/chats", chatsController);
 
 app.get("/", (_req: Request, res: Response) => {
   res.send("Server is running...");

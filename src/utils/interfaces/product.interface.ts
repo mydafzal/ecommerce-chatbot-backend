@@ -18,7 +18,9 @@ export interface Product {
   attributes: number[];
   relatedProductIds: number[];
   stockStatus: StockStatus;
-  metadata: ProductMetaData[];
+  // metadata: ProductMetaData[];
+  availableSizes: any;
+  productFeatures: any;
 }
 
 export enum StockStatus {

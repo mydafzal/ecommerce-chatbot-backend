@@ -40,6 +40,8 @@ export class ExtendedRedisChatMemory extends RedisChatMessageHistory {
 
   async addMessage(message: any) {
     const messages = await this.getMessages();
+    console.log("message");
+    console.log(message);
 
     message.additional_kwargs = {
       ...message.additional_kwargs,
@@ -84,7 +86,9 @@ export function transformProductsData(rawData: any[]): Product[] {
     onSale: product.on_sale,
     salePrice: product.sale_price,
     stockStatus: product.stock_status,
-    metadata: extractMetadata(product.meta_data, "product"),
+    // metadata: extractMetadata(product.meta_data, "product"),
+    availableSizes: extractSizes(product.meta_data), // Add sizes field
+    productFeatures: extractMetadataFeatures(product.meta_data),
   }));
 }
 
@@ -132,6 +136,52 @@ function extractMetadata(metadata: any[], entity: string) {
     key: item.key,
     value: item.value,
   }));
+}
+
+function extractMetadataFeatures(metadata: any[]) {
+  return metadata.find(
+    (item: any) =>
+      (item.key === "features_text" && !item.key.startsWith("_")) ||
+      (item.key === "size_&_fit_text" && !item.key.startsWith("_"))
+  );
+}
+
+// Helper function to extract and map sizes
+function extractSizes(metaData: any[]): Record<string, string>[] {
+  const sizes: Record<string, string>[] = [];
+  const sizeLabels: Record<string, string> = {};
+
+  // Loop through meta_data to find the size label and value pairs
+  metaData.forEach((meta) => {
+    const { key, value } = meta;
+
+    // Check for 'size_label_X_label_name' and 'size_label_X_label_value'
+    const labelMatch = key.match(/^size_label_\d+_label_name$/);
+    const valueMatch = key.match(/^size_label_\d+_label_value$/);
+
+    if (labelMatch) {
+      sizeLabels["labelName"] = value; // Temporarily store the label
+    } else if (valueMatch) {
+      sizeLabels["labelValue"] = value; // Temporarily store the value
+    }
+
+    // Once both label and value are found, push to the sizes array
+    if (sizeLabels["labelName"] && sizeLabels["labelValue"]) {
+      sizes.push({
+        [sizeLabels[
+          "labelName"
+        ]]: `${sizeLabels["labelName"]} - ${sizeLabels["labelValue"]}`,
+      });
+
+      // Clear label name and value after adding to the sizes array
+      sizeLabels["labelName"] = "";
+      sizeLabels["labelValue"] = "";
+    }
+  });
+
+  console.log("sizes");
+  console.log(sizes);
+  return sizes;
 }
 
 export function transformCustomersData(rawData: any[]): Customer[] {

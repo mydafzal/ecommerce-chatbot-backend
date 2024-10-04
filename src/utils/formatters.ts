@@ -1,4 +1,5 @@
 export function formatCategoriesToString(categories: any) {
+  // if (!categories) return '';
   return categories
     .map((category: any) => `id: ${category.id}, name: ${category.name}`)
     .join("\n");

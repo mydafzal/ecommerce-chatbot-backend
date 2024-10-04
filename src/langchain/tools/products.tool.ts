@@ -1,5 +1,5 @@
 import { DynamicStructuredTool } from "langchain/tools";
-import z from "zod";
+import z, { promise } from "zod";
 import { WooCommerceService } from "../../services/woocommerce.service";
 import { Product } from "../../utils/interfaces/product.interface";
 import { WOOCOMMERCE_ENDPOINTS } from "../../utils/constants";
@@ -8,10 +8,10 @@ import { WOOCOMMERCE_ENDPOINTS } from "../../utils/constants";
 //Improve search
 
 const productSearchSchema = z.object({
-  // search: z.string().optional().describe(
-  //   "a search term containing keywords separated by spaces, to search for products that contain these terms within their name, description or other key properties."
-  //   // "name of a specific product. do not guess this name. you will get the product details only if you specify the EXACT matching product name. this means that only when you HAVE a specific product name that actually exists in our product catalog, then you can provide that name here to get details of that product."
-  // ),
+  search: z.string().optional().describe(
+    "a search term containing keywords separated by spaces, to search for products that contain these terms within their name, description or other key properties. Extract the keyword and search the keywords. Dont include color and category name in case product name is defined."
+    // "name of a specific product. do not guess this name. you will get the product details only if you specify the EXACT matching product name. this means that only when you HAVE a specific product name that actually exists in our product catalog, then you can provide that name here to get details of that product."
+  ),
 
   category: z
     .string()
@@ -43,11 +43,36 @@ export const productSearchTool = new DynamicStructuredTool({
     "a tool for retreiving or searching product-related information for bosa's product catalog",
   schema: productSearchSchema,
   func: async (params) => {
-    const result = await WooCommerceService.searchWooCommerce<Product[]>(
-      WOOCOMMERCE_ENDPOINTS.PRODUCTS,
-      params
+    let promises = [];
+    if (params.search) {
+      promises.push(
+        WooCommerceService.searchWooCommerce<Product[]>(
+          WOOCOMMERCE_ENDPOINTS.PRODUCTS,
+          { search: params.search }
+        )
+      );
+    }
+
+    promises.push(
+      WooCommerceService.searchWooCommerce<Product[]>(
+        WOOCOMMERCE_ENDPOINTS.PRODUCTS,
+        {
+          category: params.category,
+          max_price: params.max_price,
+          min_price: params.min_price,
+          on_sale: params.on_sale,
+          stock_status: params.stock_status,
+        }
+      )
     );
 
-    return JSON.stringify(result);
+    const [searchResult, otherParamsResult] = await Promise.all(promises);
+
+    const combinedResult = {
+      searchResult,
+      otherParamsResult,
+    };
+
+    return JSON.stringify(combinedResult);
   },
 });

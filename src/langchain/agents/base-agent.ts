@@ -1,6 +1,10 @@
 import path from "path";
 import * as fs from "node:fs";
-import { SystemMessage } from "@langchain/core/messages";
+import {
+  BaseMessage,
+  HumanMessage,
+  SystemMessage,
+} from "@langchain/core/messages";
 import {
   ChatPromptTemplate,
   MessagesPlaceholder,
@@ -10,7 +14,7 @@ import { ChatOpenAI } from "@langchain/openai";
 import { StructuredToolInterface } from "@langchain/core/tools";
 import { CheerioWebBaseLoader } from "@langchain/community/document_loaders/web/cheerio";
 import { RunnableWithMessageHistory } from "@langchain/core/runnables";
-import { AgentExecutor, createOpenAIFunctionsAgent } from "langchain/agents";
+import { AgentExecutor, createOpenAIToolsAgent } from "langchain/agents";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { createRetrieverTool } from "langchain/tools/retriever";
 
@@ -18,7 +22,7 @@ import { CategoriesService } from "../../services/categories.service";
 import { formatCategoriesToString, formatObject } from "../../utils/formatters";
 import {
   chatSystemPromptForCustomers,
-  chatSystemPromptForGuestUsers,
+  chatSystemPromptForGuestCustomers,
 } from "../prompts/chat.prompt";
 import { orderSearchTool } from "../tools/orders.tool";
 import { productSearchTool } from "../tools/products.tool";
@@ -28,8 +32,22 @@ import { UserDetails } from "../../dtos";
 import { ExtendedRedisChatMemory } from "../../utils/helpers";
 import { createCustomerSearchTool } from "../tools/customers.tool";
 import { chromaStore } from "../../config/chromaDb.config";
-import { addItemToCartTool } from "../tools/cart.tool";
+import { createAddToCartItemTool } from "../tools/cart.tool";
+import { createGetCartDetailsTool } from "../tools/cartDetails.tool";
+import { RedisChatMessageHistory } from "@langchain/community/stores/message/ioredis";
 // import { customerSearchTool } from "../tools/customers.tool";
+
+import { AIMessage, FunctionMessage } from "@langchain/core/messages";
+import { formatToOpenAIFunctionMessages } from "langchain/agents/format_scratchpad";
+
+interface ToolCall {
+  id: string;
+  type: "function";
+  function: {
+    name: string;
+    arguments: string;
+  };
+}
 
 const client = new Redis(`redis://localhost:${process.env.REDIS_PORT}`);
 const tools: StructuredToolInterface[] = [productSearchTool];
@@ -118,24 +136,26 @@ export async function generateAgentResponse(
   // });
 
   let systemPrompt: any;
-
+  const addItemToCartTool = createAddToCartItemTool(chatId);
+  const getCartDetailsTool = createGetCartDetailsTool(chatId);
   if (userDetails) {
     tools.push(orderSearchTool);
     tools.push(addItemToCartTool);
+    tools.push(getCartDetailsTool);
     systemPrompt = await PromptTemplate.fromTemplate(
       chatSystemPromptForCustomers
     ).format({
       categories: formatCategoriesToString(categories),
       customer: formatObject(userDetails),
       customerName: userDetails.name,
-      loggedInUserId: userDetails.id,
+      loggedInCustomerId: userDetails.id,
     });
   } else {
     console.log("userDetails");
     console.log(userDetails);
     console.log("Guest - User");
     systemPrompt = await PromptTemplate.fromTemplate(
-      chatSystemPromptForGuestUsers
+      chatSystemPromptForGuestCustomers
     ).format({
       categories: formatCategoriesToString(categories),
     });
@@ -148,7 +168,7 @@ export async function generateAgentResponse(
     new MessagesPlaceholder("agent_scratchpad"),
   ]);
 
-  const agent = await createOpenAIFunctionsAgent({
+  const agent = await createOpenAIToolsAgent({
     llm: model,
     tools,
     prompt,
@@ -157,24 +177,58 @@ export async function generateAgentResponse(
   const agentExecutor = new AgentExecutor({
     agent,
     tools,
+    returnIntermediateSteps: true,
   });
 
-  const agentWithChatHistory = new RunnableWithMessageHistory({
-    runnable: agentExecutor,
-    getMessageHistory: (sessionId) =>
-      new ExtendedRedisChatMemory({
-        sessionId,
-        client,
-        senderName,
-      }),
-    inputMessagesKey: "input",
-    historyMessagesKey: "chat_history",
+  // Retrieve chat history from Redis
+  const chatHistory = new RedisChatMessageHistory({
+    sessionId: chatId,
+    client,
   });
+  const history = await chatHistory.getMessages();
 
-  const response = await agentWithChatHistory.invoke(
-    { input: userQuery },
+  // Execute agent with chat history
+  const response = await agentExecutor.invoke(
+    { input: userQuery, chat_history: history },
     { configurable: { sessionId: chatId } }
   );
+
+  // Format the response using the langchain formatter
+  const formattedMessages = formatToOpenAIFunctionMessages(
+    response.intermediateSteps
+  );
+
+  // Create a new AIMessage with the formatted content
+  const aiMessage = new AIMessage({
+    content: response.output,
+    additional_kwargs: {
+      function_call:
+        formattedMessages.length > 0 &&
+        "function_call" in formattedMessages[formattedMessages.length - 1]
+          ? (formattedMessages[formattedMessages.length - 1] as any)
+              .function_call
+          : undefined,
+      timestamp: new Date().getTime(),
+      id: history.length + 1,
+      senderName: senderName,
+    },
+  });
+
+  // Store the messages in Redis
+  await chatHistory.addMessage(new HumanMessage(userQuery));
+  await chatHistory.addMessage(aiMessage);
+
+  // Add tool response messages
+  for (const message of formattedMessages) {
+    if (message instanceof FunctionMessage) {
+      await chatHistory.addMessage(
+        new FunctionMessage({
+          content: message.content,
+          name: message.name ?? "",
+        })
+      );
+    }
+  }
 
   return response.output;
 }

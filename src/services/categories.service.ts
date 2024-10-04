@@ -22,9 +22,7 @@ async function setCachedCategories(categories: Category[]) {
     await connectRedis();
   }
 
-  await redisClient.set(CACHE_KEY, JSON.stringify(categories), {
-    EX: CACHE_TTL,
-  });
+  await redisClient.set(CACHE_KEY, JSON.stringify(categories));
 }
 
 async function fetchAndCacheCategories() {
