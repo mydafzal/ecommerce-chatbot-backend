@@ -10,7 +10,8 @@ async function createChat(
   cookies?: any
 ) {
   const chatId = generateChatId();
-  await redisClient.set(`chat_${chatId}_cookies`, JSON.stringify(cookies));
+  if (cookies)
+    await redisClient.set(`chat_${chatId}_cookies`, JSON.stringify(cookies));
 
   const agentResponse = await generateAgentResponse(
     chatId,
