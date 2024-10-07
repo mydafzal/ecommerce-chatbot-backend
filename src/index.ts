@@ -102,7 +102,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: ["http://localhost", "https://houseofbosa.com/staging"], // Allowed origins
+    origin: [
+      "http://localhost",
+      "https://houseofbosa.com/staging",
+      "https://fe03-13-58-150-137.ngrok-free.app",
+    ], // Allowed origins
     credentials: true,
   })
 );

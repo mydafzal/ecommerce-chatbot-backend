@@ -30,7 +30,8 @@ async function sendMessage(
   userDetails?: UserDetails,
   cookies?: any
 ) {
-  await redisClient.set(`chat_${chatId}_cookies`, JSON.stringify(cookies));
+  if (cookies)
+    await redisClient.set(`chat_${chatId}_cookies`, JSON.stringify(cookies));
   return await generateAgentResponse(chatId, message, senderName, userDetails);
 }
 
