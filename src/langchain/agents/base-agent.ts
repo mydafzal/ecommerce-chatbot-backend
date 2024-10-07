@@ -49,7 +49,9 @@ interface ToolCall {
   };
 }
 
-const client = new Redis(`redis://localhost:${process.env.REDIS_PORT}`);
+const client = new Redis(`redis://localhost:${process.env.REDIS_PORT}`, {
+  password: process.env.REDIS_PASSWORD,
+});
 const tools: StructuredToolInterface[] = [productSearchTool];
 
 const model = new ChatOpenAI({
