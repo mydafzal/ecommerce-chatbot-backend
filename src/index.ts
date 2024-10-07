@@ -106,7 +106,7 @@ app.use(
     credentials: true,
   })
 );
-app.use(cors());
+// app.use(cors());
 app.use(helmet());
 
 app.use("/staging/bosa/chats", chatsController);
