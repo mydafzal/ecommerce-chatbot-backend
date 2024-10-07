@@ -100,16 +100,17 @@ app.use(express.static(path.join(__dirname, "static")));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(
-  cors({
-    origin: [
-      "http://localhost",
-      "https://houseofbosa.com",
-      "https://fe03-13-58-150-137.ngrok-free.app",
-    ], // Allowed origins
-    credentials: true,
-  })
-);
+// app.use(
+//   cors({
+//     origin: [
+//       "http://localhost",
+//       "https://houseofbosa.com",
+//       "https://fe03-13-58-150-137.ngrok-free.app",
+//     ], // Allowed origins
+//     credentials: true,
+//   })
+// );
+app.use(cors());
 app.use(helmet());
 
 app.use("/staging/bosa/chats", chatsController);
