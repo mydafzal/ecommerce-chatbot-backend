@@ -26,6 +26,8 @@ router.post(
       cookies
     );
     // res.status(201).json({ data: response });
+    console.log("response");
+    console.log(response);
     res.status(201).send(response);
   }
 );
@@ -47,6 +49,8 @@ router.post(
       body.userDetails,
       cookies
     );
+    console.log("response");
+    console.log(response);
 
     // res.status(200).json({ data: response });
     res.status(200).send(response);
@@ -69,7 +73,6 @@ router.get("/:id", async (req: Request, res: Response) => {
       timestamp: message.data?.additional_kwargs.timestamp,
     };
   });
-
   // res.status(200).json({ data: messages.reverse() });
   res.status(200).send({ data: messages.reverse() });
 });
