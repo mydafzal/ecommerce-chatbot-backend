@@ -104,7 +104,7 @@ app.use(
   cors({
     origin: [
       "http://localhost",
-      "https://houseofbosa.com/staging",
+      "https://houseofbosa.com",
       "https://fe03-13-58-150-137.ngrok-free.app",
     ], // Allowed origins
     credentials: true,
