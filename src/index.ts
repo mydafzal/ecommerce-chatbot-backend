@@ -108,7 +108,7 @@ app.use(
 );
 app.use(helmet());
 
-app.use("/bosa/chats", chatsController);
+app.use("/staging/bosa/chats", chatsController);
 
 app.get("/", (_req: Request, res: Response) => {
   res.send("Server is running...");
