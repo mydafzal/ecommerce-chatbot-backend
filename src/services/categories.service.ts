@@ -32,7 +32,10 @@ async function fetchAndCacheCategories() {
     }
 
     const categories = await WooCommerceService.searchWooCommerce<Category[]>(
-      WOOCOMMERCE_ENDPOINTS.CATEGORIES
+      WOOCOMMERCE_ENDPOINTS.CATEGORIES,
+      {
+        per_page: 100,
+      }
     );
 
     if (categories) {
