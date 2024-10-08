@@ -65,8 +65,8 @@ async function addKnowledgeTool() {
 }
 
 async function addFAQDocsToChromaDB() {
-  // const filePath = path.join(__dirname, "FAQ.txt");
-  const filePath = path.join("./FAQ.txt");
+  // const filePath = path.join(__dirname, "FAQ.txt"); //For local
+  const filePath = "/var/www/bosa-chatbot-backend/src/langchain/agents/FAQ.txt"; // for deployment
 
   try {
     const text = fs.readFileSync(filePath, "utf8");
