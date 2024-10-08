@@ -112,7 +112,7 @@ async function addTermsAndConditionsToChromaDB() {
 
 addKnowledgeTool();
 // addTermsAndConditionsToChromaDB();
-addFAQDocsToChromaDB();
+// addFAQDocsToChromaDB();
 export async function generateAgentResponse(
   chatId: string,
   userQuery: string,
