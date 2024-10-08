@@ -65,7 +65,8 @@ async function addKnowledgeTool() {
 }
 
 async function addFAQDocsToChromaDB() {
-  const filePath = path.join(__dirname, "FAQ.txt");
+  // const filePath = path.join(__dirname, "FAQ.txt");
+  const filePath = path.join("./FAQ.txt");
 
   try {
     const text = fs.readFileSync(filePath, "utf8");
