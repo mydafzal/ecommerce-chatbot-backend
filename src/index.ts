@@ -96,7 +96,9 @@ const app: Express = express();
 const port = process.env.PORT || 3000;
 
 // Serve static files from the 'static' directory
-app.use(express.static(path.join(__dirname, "static")));
+
+// app.use(express.static(path.join(__dirname, "static"))); //local
+app.use(express.static(path.join("/var/www/bosa-chatbot-backend/", "static"))); //deployed
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
