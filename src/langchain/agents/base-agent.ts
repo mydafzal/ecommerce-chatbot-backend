@@ -1,10 +1,6 @@
 import path from "path";
 import * as fs from "node:fs";
-import {
-  BaseMessage,
-  HumanMessage,
-  SystemMessage,
-} from "@langchain/core/messages";
+import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import {
   ChatPromptTemplate,
   MessagesPlaceholder,
@@ -13,7 +9,6 @@ import {
 import { ChatOpenAI } from "@langchain/openai";
 import { StructuredToolInterface } from "@langchain/core/tools";
 import { CheerioWebBaseLoader } from "@langchain/community/document_loaders/web/cheerio";
-import { RunnableWithMessageHistory } from "@langchain/core/runnables";
 import { AgentExecutor, createOpenAIToolsAgent } from "langchain/agents";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { createRetrieverTool } from "langchain/tools/retriever";
@@ -29,7 +24,6 @@ import { productSearchTool } from "../tools/products.tool";
 
 import { Redis } from "ioredis";
 import { UserDetails } from "../../dtos";
-import { ExtendedRedisChatMemory } from "../../utils/helpers";
 import { createCustomerSearchTool } from "../tools/customers.tool";
 import { chromaStore } from "../../config/chromaDb.config";
 import { createAddToCartItemTool } from "../tools/cart.tool";
@@ -40,14 +34,14 @@ import { RedisChatMessageHistory } from "@langchain/community/stores/message/ior
 import { AIMessage, FunctionMessage } from "@langchain/core/messages";
 import { formatToOpenAIFunctionMessages } from "langchain/agents/format_scratchpad";
 
-interface ToolCall {
-  id: string;
-  type: "function";
-  function: {
-    name: string;
-    arguments: string;
-  };
-}
+// interface ToolCall {
+//   id: string;
+//   type: "function";
+//   function: {
+//     name: string;
+//     arguments: string;
+//   };
+// }
 
 const client = new Redis(`redis://localhost:${process.env.REDIS_PORT}`, {
   password: process.env.REDIS_PASSWORD,
@@ -116,8 +110,8 @@ async function addTermsAndConditionsToChromaDB() {
 }
 
 addKnowledgeTool();
-// addTermsAndConditionsToChromaDB();
-// addFAQDocsToChromaDB();
+addTermsAndConditionsToChromaDB();
+addFAQDocsToChromaDB();
 export async function generateAgentResponse(
   chatId: string,
   userQuery: string,
