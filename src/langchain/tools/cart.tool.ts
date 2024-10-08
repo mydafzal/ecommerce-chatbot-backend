@@ -41,6 +41,8 @@ export function createAddToCartItemTool(chatId: string) {
     func: async (params) => {
       try {
         let cookies = await redisClient.get(`chat_${chatId}_cookies`);
+        console.log("cookies");
+        console.log(cookies);
         if (cookies) {
           cookies = JSON.parse(cookies);
         }
