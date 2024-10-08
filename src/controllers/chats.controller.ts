@@ -1,7 +1,7 @@
 import { Request, Response, Router } from "express";
 
 import { redisClient } from "../config/redis.config";
-import { CreateChatDto, SendMessageDto } from "../dtos";
+import { SendMessageDto } from "../dtos";
 import { validateRequest } from "../middleware/validator.middleware";
 import { ChatsService } from "../services/chats.service";
 import {
