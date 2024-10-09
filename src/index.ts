@@ -116,19 +116,9 @@ app.use(
 );
 // app.use(cors());
 
-// Middleware to set a cookie
-app.use((req, res, next) => {
-  res.cookie("cookieName", "cookieValue", {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none", // Changed "None" to "none"
-  });
-  next(); // Call the next middleware or route handler
-});
-
 app.use(helmet());
 
-app.use("/staging/bosa/chats", chatsController);
+app.use("/staging/chats", chatsController);
 
 app.get("/", (_req: Request, res: Response) => {
   res.send("Server is running...");
