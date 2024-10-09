@@ -18,7 +18,7 @@ export function createGetCartDetailsTool(chatId: string) {
 
         const response = await fetch(
           // "http://localhost/bosa/wp-json/bosa/v1/cart/get-contents",
-          "https://houseofbosa.com/staging/wp-json/staging/bosa/v1/cart/get-contents",
+          "https://houseofbosa.com/staging/wp-json/staging/v1/cart/get-contents",
           {
             method: "GET",
             headers: {

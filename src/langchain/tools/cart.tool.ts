@@ -52,7 +52,7 @@ export function createAddToCartItemTool(chatId: string) {
         const { items } = params;
         const response = await fetch(
           // "http://localhost/bosa/wp-json/bosa/v1/cart/add-item",
-          "https://houseofbosa.com/staging/wp-json/staging/bosa/v1/cart/add-item",
+          "https://houseofbosa.com/staging/wp-json/staging/v1/cart/add-item",
           {
             method: "POST",
             headers: {
