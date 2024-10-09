@@ -106,11 +106,26 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: ["http://localhost", "https://houseofbosa.com"], // Allowed origins
+    origin: [
+      "http://localhost",
+      "https://houseofbosa.com",
+      "https://www.houseofbosa.com",
+    ], // Allowed origins
     credentials: true,
   })
 );
 // app.use(cors());
+
+// Middleware to set a cookie
+app.use((req, res, next) => {
+  res.cookie("cookieName", "cookieValue", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none", // Changed "None" to "none"
+  });
+  next(); // Call the next middleware or route handler
+});
+
 app.use(helmet());
 
 app.use("/staging/bosa/chats", chatsController);
