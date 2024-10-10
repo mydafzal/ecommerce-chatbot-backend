@@ -212,7 +212,16 @@ export async function generateAgentResponse(
   });
 
   // Store the messages in Redis
-  await chatHistory.addMessage(new HumanMessage(userQuery));
+
+  const humanMessage = new HumanMessage({
+    content: userQuery,
+    additional_kwargs: {
+      timestamp: new Date().getTime(),
+      id: history.length + 1,
+      senderName: senderName,
+    },
+  });
+  await chatHistory.addMessage(humanMessage);
   await chatHistory.addMessage(aiMessage);
 
   // Add tool response messages
