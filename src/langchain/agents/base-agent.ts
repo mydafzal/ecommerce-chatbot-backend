@@ -133,9 +133,10 @@ export async function generateAgentResponse(
   // });
 
   let systemPrompt: any;
-  const addItemToCartTool = createAddToCartItemTool(chatId);
-  const getCartDetailsTool = createGetCartDetailsTool(chatId);
+
   if (userDetails) {
+    const addItemToCartTool = createAddToCartItemTool(chatId);
+    const getCartDetailsTool = createGetCartDetailsTool(chatId);
     tools.push(orderSearchTool);
     tools.push(addItemToCartTool);
     tools.push(getCartDetailsTool);
