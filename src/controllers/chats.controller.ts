@@ -8,8 +8,17 @@ import {
   createChatSchema,
   sendMessageSchema,
 } from "../validators/chats. validator";
+import {
+  addFAQDocsToChromaDB,
+  addTermsAndConditionsToChromaDB,
+} from "../langchain/agents/base-agent";
+import { chromaStore } from "../config/chromaDb.config";
+import { ChromaClient } from "chromadb";
 
 const router = Router();
+const client = new ChromaClient({
+  path: "http://localhost:8000",
+});
 
 router.post(
   "/",
@@ -22,8 +31,8 @@ router.post(
     console.log("cookies");
     console.log(cookies);
 
-    console.log("req?.body?.userDetails?.cookieValue")
-    console.log(req?.body?.userDetails?.cookieValue)
+    console.log("req?.body?.userDetails?.cookieValue");
+    console.log(req?.body?.userDetails?.cookieValue);
     const response = await ChatsService.createChat(
       req?.body?.message,
       req?.body?.senderName,
@@ -50,9 +59,8 @@ router.post(
     console.log("cookies");
     console.log(cookies);
 
-
-    console.log("req?.body?.userDetails?.cookieValue")
-    console.log(req?.body?.userDetails?.cookieValue)
+    console.log("req?.body?.userDetails?.cookieValue");
+    console.log(req?.body?.userDetails?.cookieValue);
 
     const response = await ChatsService.sendMessage(
       req.params.id,
@@ -253,6 +261,48 @@ router.post("/cart/get-item", async (req: Request, res: Response) => {
     res
       .status(500)
       .json({ error: "An error occurred while adding item to cart" });
+  }
+});
+
+router.post("/uploadFAQ", async (req: Request, res: Response) => {
+  try {
+    await addFAQDocsToChromaDB();
+
+    res.status(200).json("FAQ added successfully");
+  } catch (error) {
+    console.error("Error adding item to cart:", error);
+    res.status(500).json({ error: "An error occurred" });
+  }
+});
+
+router.post("/uploadTCS", async (req: Request, res: Response) => {
+  try {
+    await addTermsAndConditionsToChromaDB();
+
+    res.status(200).json("TC's added successfully");
+  } catch (error) {
+    console.error("Error adding item to cart:", error);
+    res.status(500).json({ error: "An error occurred" });
+  }
+});
+
+router.post("/clearChromaDb", async (req: Request, res: Response) => {
+  try {
+    const collections = await client.listCollections();
+
+    console.log("BEFORE collections ", collections?.length);
+
+    if (collections?.length > 0) {
+      await Promise.all(
+        collections.map((item) => client.deleteCollection({ name: item.name }))
+      );
+    }
+    console.log("AFTER collections ", collections?.length);
+
+    res.status(200).json("Deleted Successfully");
+  } catch (error) {
+    console.error("Error adding item to cart:", error);
+    res.status(500).json({ error: "An error occurred " });
   }
 });
 

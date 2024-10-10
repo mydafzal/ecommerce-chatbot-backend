@@ -6,7 +6,7 @@ const embeddings = new OpenAIEmbeddings({
 });
 
 export const chromaStore = new Chroma(embeddings, {
-  collectionName: "test",
+  collectionName: "bosa",
   url: "http://localhost:8000", // Optional, will default to this value
   collectionMetadata: {
     "hnsw:space": "cosine",

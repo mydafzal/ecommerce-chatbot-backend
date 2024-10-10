@@ -64,9 +64,9 @@ async function addKnowledgeTool() {
   tools.push(retrieverTool);
 }
 
-async function addFAQDocsToChromaDB() {
-  // const filePath = path.join(__dirname, "FAQ.txt"); //For local
-  const filePath = "/var/www/bosa-chatbot-backend/src/langchain/agents/FAQ.txt"; // for deployment
+export async function addFAQDocsToChromaDB() {
+  const filePath = path.join(__dirname, "FAQ.txt"); //For local
+  // const filePath = "/var/www/bosa-chatbot-backend/src/langchain/agents/FAQ.txt"; // for deployment
 
   try {
     const text = fs.readFileSync(filePath, "utf8");
@@ -75,6 +75,7 @@ async function addFAQDocsToChromaDB() {
     });
     const docs = await textSplitter.createDocuments([text]);
 
+    console.log(docs);
     // Adding documents to Chroma DB
     await chromaStore.addDocuments(docs);
 
@@ -84,7 +85,7 @@ async function addFAQDocsToChromaDB() {
   }
 }
 
-async function addTermsAndConditionsToChromaDB() {
+export async function addTermsAndConditionsToChromaDB() {
   try {
     const loader = new CheerioWebBaseLoader(
       "https://houseofbosa.com/staging/terms-and-conditions/"
