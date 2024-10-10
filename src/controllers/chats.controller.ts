@@ -25,7 +25,8 @@ router.post(
       req?.body?.message,
       req?.body?.senderName,
       req?.body?.userDetails,
-      cookies
+      req?.body?.userDetails?.cookieValue
+      // cookies
     );
     // res.status(201).json({ data: response });
     console.log("response");
@@ -51,7 +52,8 @@ router.post(
       body.message,
       body.senderName,
       body.userDetails,
-      cookies
+      // cookies
+      req?.body?.userDetails?.cookieValue
     );
     console.log("response");
     console.log(response);
