@@ -22,7 +22,6 @@ const addItemToCartSchema = z.object({
           ),
         size: z
           .string()
-          .optional()
           .describe("Size of the product e.g., XL - 34 (if applicable)"),
         color: z
           .string()
