@@ -21,6 +21,9 @@ router.post(
     console.log(req.body);
     console.log("cookies");
     console.log(cookies);
+
+    console.log("req?.body?.userDetails?.cookieValue")
+    console.log(req?.body?.userDetails?.cookieValue)
     const response = await ChatsService.createChat(
       req?.body?.message,
       req?.body?.senderName,
@@ -46,6 +49,10 @@ router.post(
     console.log(req.body);
     console.log("cookies");
     console.log(cookies);
+
+
+    console.log("req?.body?.userDetails?.cookieValue")
+    console.log(req?.body?.userDetails?.cookieValue)
 
     const response = await ChatsService.sendMessage(
       req.params.id,
