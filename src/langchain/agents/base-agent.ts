@@ -43,12 +43,9 @@ import { formatToOpenAIFunctionMessages } from "langchain/agents/format_scratchp
 //   };
 // }
 
-const client = new Redis(
-  `redis://localhost:${process.env.REDIS_PORT}`
-  //   , {
-  //   password: process.env.REDIS_PASSWORD,
-  // }
-);
+const client = new Redis(`redis://localhost:${process.env.REDIS_PORT}`, {
+  password: process.env.REDIS_PASSWORD,
+});
 const tools: StructuredToolInterface[] = [productSearchTool, orderSearchTool];
 
 const model = new ChatOpenAI({
