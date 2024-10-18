@@ -43,10 +43,13 @@ import { formatToOpenAIFunctionMessages } from "langchain/agents/format_scratchp
 //   };
 // }
 
-const client = new Redis(`redis://localhost:${process.env.REDIS_PORT}`, {
-  password: process.env.REDIS_PASSWORD,
-});
-const tools: StructuredToolInterface[] = [productSearchTool];
+const client = new Redis(
+  `redis://localhost:${process.env.REDIS_PORT}`
+  //   , {
+  //   password: process.env.REDIS_PASSWORD,
+  // }
+);
+const tools: StructuredToolInterface[] = [productSearchTool, orderSearchTool];
 
 const model = new ChatOpenAI({
   model: "gpt-4o-mini",
@@ -138,7 +141,7 @@ export async function generateAgentResponse(
   if (userDetails) {
     const addItemToCartTool = createAddToCartItemTool(chatId);
     const getCartDetailsTool = createGetCartDetailsTool(chatId);
-    tools.push(orderSearchTool);
+
     tools.push(addItemToCartTool);
     tools.push(getCartDetailsTool);
     systemPrompt = await PromptTemplate.fromTemplate(

@@ -23,16 +23,12 @@ const orderSearchSchema = z.object({
     ])
     .optional()
     .describe("search orders matching that are currently in a specific status"),
+
   // customer: z
   //   .number()
-  //   .optional()
-  //   .describe("search orders for a specific customer"),
-
-  customer: z
-    .number()
-    .describe(
-      "This is securely retrieved from the userDetails object, not extract from user input."
-    ),
+  //   .describe(
+  //     "This is securely retrieved from the userDetails object, not extract from user input."
+  //   ),
 });
 
 export const orderSearchTool = new DynamicStructuredTool({
